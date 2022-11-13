@@ -11,9 +11,9 @@ import {
     updateDoc,
     doc,
     addDoc,
-    deleteDoc
+    deleteDoc,
 } from "firebase/firestore";
-
+import Swal from "sweetalert2";
 const style = {
     bg: `h-screen w-screen p-4 bg-gradient-to-r from-[#2F80ED] to-[#1CB5E0]`,
     container: `bg-slate-100 max-w-{500px} w-full m-auto rounded-md shadow-xl p-4`,
@@ -25,25 +25,33 @@ const style = {
 };
 function App() {
     const [todos, setTodos] = useState([]);
-    const [input, setInput] = useState('')
+    const [input, setInput] = useState("");
 
+
+    const showAlert = () => {
+        Swal.fire({
+            title: "Warning",
+            html: "<b>Please enter a valid Todo</b>",
+            icon: "warning",
+            timer: 2000,
+            heightAuto: false,
+            width:'70%'
+        });
+    };
 
     //create todo
     const createTodo = async (e) => {
-        e.preventDefault(e)
-        if (input === '') {
-            alert('Please enter a valid todo')
-            return
+        e.preventDefault(e);
+        if (input === "") {
+            showAlert();
+            return;
         }
-        await addDoc(collection(db, 'todos'), {
+        await addDoc(collection(db, "todos"), {
             text: input,
             completed: false,
-        })
-        setInput('')
-    }
-
-
-
+        });
+        setInput("");
+    };
 
     //read todo from firebase
     useEffect(() => {
@@ -53,21 +61,21 @@ function App() {
             querySnapshot.forEach((doc) => {
                 todosArray.push({ ...doc.data(), id: doc.id });
             });
-            setTodos(todosArray)
+            setTodos(todosArray);
         });
-        return ()=> unsubscribe()
+        return () => unsubscribe();
     }, []);
 
     //update todo in firebase
     const toggleComplete = async (todo) => {
-        await updateDoc(doc (db, 'todos', todo.id), {
-            completed: !todo.completed
-        })
-    }
+        await updateDoc(doc(db, "todos", todo.id), {
+            completed: !todo.completed,
+        });
+    };
     //delete todo
     const deleteTodo = async (id) => {
-        await deleteDoc(doc(db, 'todos', id))
-    }
+        await deleteDoc(doc(db, "todos", id));
+    };
 
     return (
         <div className={style.bg}>
